@@ -12,6 +12,7 @@
 
 class WildFire : public CellularAutomaton
 {
+    std::vector<sf::Color> m_cellColor;
     public:
         enum class CellType
         {

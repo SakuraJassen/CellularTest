@@ -1,4 +1,5 @@
 #pragma once
+#include <SFML/Graphics.hpp>
 
 class Cell
 {
@@ -12,7 +13,7 @@ class Cell
 
         sf::Vector2i m_pos;
         uint m_life;
-    private:
+    protected:
         sf::Color m_cellColor;
 
 };

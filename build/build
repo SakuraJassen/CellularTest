@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+find . -iwholename '*make*' -not -name CMakeLists.txt -delete
+cmake ../source
+make

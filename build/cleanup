@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+echo "Delete all CMake Files"
+find . -iwholename '*make*' -not -name CMakeLists.txt -delete

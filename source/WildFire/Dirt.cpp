@@ -8,4 +8,5 @@ Dirt::Dirt(sf::Vector2i pos)
 Dirt::Dirt(sf::Vector2i pos, sf::Color color)
 	: Cell(pos, color)
 { }
+
 void Dirt::update() {}

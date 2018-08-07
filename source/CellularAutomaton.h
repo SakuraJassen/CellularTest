@@ -32,6 +32,7 @@ class CellularAutomaton
         const Config* const m_pConfig;
         void addQuad(unsigned xIndex, unsigned yIndex);
         std::vector<sf::Vertex> m_cellVertexPoints;
+        bool m_isInEditMode = true;
 };
 
 template<typename Func>

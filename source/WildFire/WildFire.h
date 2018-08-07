@@ -19,6 +19,7 @@ class WildFire : public CellularAutomaton
             Dirt,
             Tree,
             Fire,
+            DeadTree
         };
 
         struct Cell
@@ -53,9 +54,7 @@ class WildFire : public CellularAutomaton
         std::optional<sf::Vector2i> getMouseInputPosition() const;
         void onRenderCells(sf::RenderWindow& window) override;
 
-        //std::unique_ptr<InputMode> m_inputMode;
         std::vector<Cell> m_cells;
         bool canGrow;
         bool canBurn;
-        bool m_isInEditMode = true;
 };

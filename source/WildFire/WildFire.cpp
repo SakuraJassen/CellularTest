@@ -5,8 +5,6 @@
 #include "../Util/Random.h"
 #include "../App.h"
 
-//#include "PointInputMode.h"
-//#include "LineInputMode.h"
 
 WildFire::WildFire(const Config & config, const App& app)
     : CellularAutomaton(config, app)
@@ -14,12 +12,11 @@ WildFire::WildFire(const Config & config, const App& app)
     , m_cellColor{{
             { 139, 69, 19 },    //Dirt
             { 0, 255, 0 },      //Tree
-            { 255, 0, 0 } } }   //Fire
+            { 255, 0, 0 },      //Fire
+            { 126, 0, 0 } } }   //DeadTree
 {
     canGrow = true;
     canBurn = false;
-
-    //m_inputMode = std::make_unique<PointInputMode>(*this);
 
     std::mt19937 rng((unsigned)std::time(nullptr));
     Cell c;
@@ -30,7 +27,7 @@ WildFire::WildFire(const Config & config, const App& app)
     cellForEach([&](unsigned x, unsigned y)
     {
         unsigned index = getCellIndex(x, y);
-        std::uniform_int_distribution<int> dist(0, 1);
+        std::uniform_int_distribution<int> dist(0, 0);
 
         auto& cell = m_cells[index];
         cell.m_ct = (CellType)dist(rng);
@@ -42,17 +39,7 @@ WildFire::WildFire(const Config & config, const App& app)
 void WildFire::input(const sf::Event& e)
 {
     if (e.type == sf::Event::KeyReleased) {
-        //m_inputMode->onKeyPressed(e.key.code);
-
-        if (e.key.code == sf::Keyboard::P) {
-            std::cout << "Switched to POINT input mode" << '\n';
-            //m_inputMode = std::make_unique<PointInputMode>(*this);
-        }
-        else if (e.key.code == sf::Keyboard::L) {
-            std::cout << "Switched to LINE input mode" << '\n';
-            ////m_inputMode = std::make_unique<LineInputMode>(*this);
-        }
-        else if (e.key.code == sf::Keyboard::Q) {
+        if (e.key.code == sf::Keyboard::Q) {
             std::cout << "Toggled SIM/EDIT mode" << '\n';
             m_isInEditMode = !m_isInEditMode;
         }
@@ -65,8 +52,6 @@ void WildFire::input(const sf::Event& e)
     auto cellInfo = getCellPointInfo(*cellLocation);
 
     if (e.type == sf::Event::MouseButtonReleased) {
-        //m_inputMode->onMouseReleased(e, cellInfo);
-
         if (e.mouseButton.button == sf::Mouse::Left) {
             setCell(cellInfo.x, cellInfo.y,
                 (int)(cellInfo.cell->m_ct) == (int)CellType::Tree ?
@@ -77,7 +62,6 @@ void WildFire::input(const sf::Event& e)
         }
     }
     else if (e.type == sf::Event::MouseButtonPressed) {
-        //m_inputMode->onMousePressed(e, cellInfo);
     }
 }
 
@@ -88,8 +72,7 @@ void WildFire::update()
         if (!cellLocation) {
             return;
         }
-        auto cellInfo = getCellPointInfo(*cellLocation);
-        m_inputMode->update(cellInfo);*/
+        auto cellInfo = getCellPointInfo(*cellLocation);*/
     }
     else {
         std::vector<std::pair<sf::Vector2i, CellType>> updates;
@@ -102,15 +85,14 @@ void WildFire::update()
             {
                 case CellType::Dirt:
                     if (canGrow &&
-                        Random::get().intInRange(1,1000) > (990))
+                        Random::get().intInRange(1,10000) > (9925))
                     {
                         updates.emplace_back(loc, CellType::Tree);
                     }
                     break;
-
                 case CellType::Tree:
                     if (canBurn &&
-                        Random::get().intInRange(1,1000) > (999))
+                        Random::get().intInRange(1,10000) > (9999))
                     {
                         updates.emplace_back(loc, CellType::Fire);
                     }
@@ -140,12 +122,15 @@ void WildFire::update()
                         case 1:
                             break;
                         case 2:
-                            updates.emplace_back(loc, CellType::Dirt);
+                            updates.emplace_back(loc, CellType::DeadTree);
                             break;
                         default:
-                            updates.emplace_back(loc, CellType::Dirt);
                             break;
                     }
+                    break;
+                case CellType::DeadTree:
+                    if(cell.m_life > 60)
+                        updates.emplace_back(loc, CellType::Dirt);
                     break;
             }
         });
@@ -201,13 +186,12 @@ const Config & WildFire::getConfig() const
 
 void WildFire::onRenderCells(sf::RenderWindow & window)
 {
-    //m_inputMode->render(window);
 }
 
 void WildFire::updateCellColor(unsigned x, unsigned y)
 {
     //TODO: bottleneck?
-    sf::Color updateColor = {0,0,0};
+    sf::Color updateColor = { 255, 165, 200 };
     int index = getCellIndex(x, y);
     auto cell = m_cells[index];
     switch (cell.m_ct)
@@ -234,6 +218,10 @@ void WildFire::updateCellColor(unsigned x, unsigned y)
                     updateColor = { 255, 165, 200 };
                     break;
             }
+            break;
+        case CellType::DeadTree:
+            updateColor = { 44, 44, 44 };
+            break;
     }
 
     CellularAutomaton::setCellColour(x, y, updateColor);
